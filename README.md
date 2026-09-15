@@ -1,2 +1,2 @@
-# labirinto-girat-rio---C-
+# labirinto-giratorio
 Trabalho de Algoritmos e Programação 2
