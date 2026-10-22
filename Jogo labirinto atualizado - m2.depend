@@ -1,0 +1,11 @@
+# depslib dependency file v1.0
+1792633250 source:c:\users\william\documents\jogo labirinto - trabalho 1\jogo labirinto atualizado - m2\main.cpp
+	<iostream>
+	<conio.h>
+	<windows.h>
+	<string>
+	<fstream>
+	<sstream>
+	<cctype>
+	<cstdio>
+
