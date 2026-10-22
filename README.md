@@ -6,6 +6,7 @@ Instituição: UNIVALI - Itajaí
 Integrante: William da Silva Wagner
 Versão: M2 - 2026
 Professor: Thiago Felski Pereira
+Desenvolvido em Windows
 
 | Sobre o projeto |
 
