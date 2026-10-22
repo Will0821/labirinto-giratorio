@@ -129,7 +129,7 @@ M2 - Verificação da estrutura e dos valores dos arquivos de mapa
 
 | Alterações nas funções |
 
-Movimentação do jogador
+Função Movimentação do jogador
 
 M1 - bool moveplayer(char tecla, int &px, int &py, int m[11][11], int bx, int by, int orientacao){
     switch(tecla){
@@ -199,7 +199,7 @@ M2 - bool moveplayer(char tecla, Jogo &jogo){
     return false;
 }
 
-Gravidade
+Função Gravidade
 
 M1 - void gravidade(int m[11][11], int &bx, int &by, int px, int py, int orientacao){
 
@@ -253,7 +253,7 @@ M2 - void gravidade(Jogo &jogo){
     }
 }
 
-Rotação do cenário
+Função Rotação do cenário
 
 M1 - void rotacionar(char tecla, int &orientacao, int&rotacoes){
     if(tecla == 'e'){
@@ -277,7 +277,435 @@ M2 - void rotacionar(char tecla, Jogo &jogo){
     }
 }
 
-Defeitos corrigidos e decisões de implementação
+Função Carregar mapa
+
+M1 - void carregarMapa(int numeroMapa, int m[11][11], int &px, int &py, int &bx, int &by, int &orientacao, int &movimentos, int &rotacoes){
+
+    if(numeroMapa == 1){
+
+        /* 0 = Vazio, 1 = Parede fixa, 4 = Alavanca, 5 = Saida,
+        6 = Porta tipo A, 7 = Porta tipo B */
+
+        int mapa[11][11] = {
+            {1,1,1,1,1,1,1,1,1,1,1},
+            {1,0,4,1,0,0,0,0,0,0,1},
+            {1,1,0,1,0,1,1,1,1,0,1},
+            {1,7,0,1,0,0,0,0,1,0,1},
+            {1,0,1,1,1,1,1,0,1,0,1},
+            {1,0,0,1,0,0,0,0,1,0,1},
+            {1,1,0,1,0,1,1,1,4,0,1},
+            {1,0,0,1,0,1,0,0,0,0,1},
+            {1,0,1,1,0,1,0,1,1,1,1},
+            {1,0,0,0,0,1,0,6,0,5,1},
+            {1,1,1,1,1,1,1,1,1,1,1}
+        };
+
+        for(int i = 0;i < 11;i++){
+            for(int j = 0;j < 11;j++){
+                m[i][j] = mapa[i][j];
+            }
+        }
+        /* px = linha do jogador, py = coluna do jogador
+        bx = linha do bloco, by = coluna do bloco */
+
+        px = 1, py = 1;
+        bx = 9, by = 8;
+        orientacao = 0, movimentos = 0, rotacoes = 0;
+    }
+
+    if(numeroMapa == 2){
+
+        int mapa[11][11] = {
+            {1,1,1,1,1,1,1,1,1,1,1},
+            {1,0,1,0,6,0,0,0,0,4,1},
+            {1,4,1,0,1,1,1,1,0,1,1},
+            {1,0,0,0,1,5,1,0,0,1,1},
+            {1,1,1,1,1,0,1,7,1,1,1},
+            {1,0,7,7,7,0,1,0,1,1,1},
+            {1,0,1,1,1,1,1,0,1,1,1},
+            {1,0,0,0,0,0,1,0,1,1,1},
+            {1,0,4,1,1,0,1,7,1,1,1},
+            {1,7,0,6,0,0,6,0,4,1,1},
+            {1,1,1,1,1,1,1,1,1,1,1}
+        };
+
+        for(int i = 0;i < 11;i++){
+            for(int j = 0;j < 11;j++){
+                m[i][j] = mapa[i][j];
+            }
+        }
+        px = 1; py = 1;
+        bx = 3; by = 1;
+        orientacao = 0, movimentos = 0, rotacoes = 0;
+    }
+
+    if(numeroMapa == 3){
+
+        int mapa[11][11] = {
+            {1,1,1,1,1,1,1,1,1,1,1},
+            {1,0,0,0,0,1,0,0,0,5,1},
+            {1,1,1,1,0,1,7,1,1,1,1},
+            {1,0,0,0,0,1,0,0,0,0,1},
+            {1,0,1,1,1,1,1,1,1,7,1},
+            {1,0,0,0,0,1,0,0,0,0,1},
+            {1,1,1,1,0,1,7,1,1,1,1},
+            {1,1,1,0,0,1,0,0,0,0,1},
+            {1,1,1,0,1,1,1,1,1,7,1},
+            {1,1,4,0,0,0,0,0,0,0,1},
+            {1,1,1,1,1,1,1,1,1,1,1}
+        };
+
+        for(int i = 0;i < 11;i++){
+            for(int j = 0;j < 11;j++){
+                m[i][j] = mapa[i][j];
+            }
+        }
+        px = 1; py = 1;
+        bx = 1; by = 8;
+        orientacao = 0, movimentos = 0, rotacoes = 0;
+    }
+}
+
+M2 - bool carregarMapa(Jogo &jogo, int numeroMapa, string &erro){
+    ifstream arquivo;
+
+    // Monta o nome do arquivo conforme o numero do mapa e abre o arquivo para leitura
+    string nomeArquivo = "mapa" + to_string(numeroMapa) + ".csv";
+    arquivo.open(nomeArquivo);
+
+    if(!arquivo.is_open()){
+        erro = "Arquivo CSV nao encontrado.";
+        return false;
+    }
+
+    string linha;
+    int numeroLinha = 1; // primeira linha do csv contem a dimensao do mapa
+
+    if(!getline(arquivo, linha)){
+        erro = "Dimensao do mapa ausente.";
+        arquivo.close();
+        return false;
+    }
+
+    stringstream converteN(linha);
+    if(!(converteN >> jogo.n)){
+        erro = "Linha 1: dimensao invalida. Informe um numero inteiro.";
+        arquivo.close();
+        return false;
+    }
+    string extra;
+    if(converteN >> extra){
+        erro = "Linha 1: dimensao invalida. Existem caracteres extras.";
+        arquivo.close();
+        return false;
+    }
+    if(jogo.n < 11 || jogo.n > TAM){
+        erro = "Linha 1: dimensao invalida. Deve estar entre 11 e " + to_string(TAM) + ".";
+        arquivo.close();
+        return false;
+    }
+
+    numeroLinha++;
+    // jogo.titulo.empty verifica se a string esta vazia
+    if(!getline(arquivo, jogo.titulo) || jogo.titulo.empty()){
+        erro = "Linha " + to_string(numeroLinha) + ": titulo ausente ou vazio.";
+        arquivo.close();
+        return false;
+    }
+
+    jogo.numeroMapa = numeroMapa;
+    jogo.orientacao = 0;
+    jogo.movimentos = 0;
+    jogo.rotacoes = 0;
+
+    jogo.jogador.linha = -1;
+    jogo.jogador.coluna = -1;
+    jogo.bloco.linha = -1;
+    jogo.bloco.coluna = -1;
+
+    int saidas = 0;
+
+    //Le matriz
+    for(int i = 0;i < jogo.n;i++){
+        numeroLinha++;
+
+        if(!getline(arquivo, linha)){
+            erro = "Linha " + to_string(numeroLinha) + ": linha da matriz ausente.";
+            arquivo.close();
+            return false;
+        }
+
+        stringstream linhaCSV(linha);
+        string valor;
+
+        for(int j = 0;j < jogo.n;j++){
+            if(!getline(linhaCSV, valor, ',')){
+                erro = "Linha " + to_string(numeroLinha) + ": quantidade de colunas insuficiente.";
+                arquivo.close();
+                return false;
+            }
+
+            //length vai rejeitar valores com + ou - de 1 caractere
+            if(valor.length() != 1 || valor[0] < '0' || valor[0] > '7'){
+                erro = "Linha " + to_string(numeroLinha) + ", coluna " + to_string(j + 1) + ": valor invalido. Use numeros de 0 a 7.";
+                arquivo.close();
+                return false;
+            }
+            int tipo = valor[0] - '0'; //converte para inteiro
+
+            jogo.cenario[i][j] = tipo;
+
+            //guarda posicao inicial do jogador
+            if(tipo == 2){
+                if(jogo.jogador.linha != -1){
+                    erro = "Linha " + to_string(numeroLinha) + ": jogador duplicado. O mapa deve ter apenas um jogador.";
+                    arquivo.close();
+                    return false;
+                }
+
+                jogo.jogador.linha = i;
+                jogo.jogador.coluna = j;
+                jogo.cenario[i][j] = 0;
+            }
+
+            //guarda posicao inicial do bloco
+            if(tipo == 3){
+                if(jogo.bloco.linha != -1){
+                    erro = "Linha " + to_string(numeroLinha) + ": bloco duplicado. O mapa deve ter apenas um bloco.";
+                    arquivo.close();
+                    return false;
+                }
+
+                jogo.bloco.linha = i;
+                jogo.bloco.coluna = j;
+                jogo.cenario[i][j] = 0;
+            }
+
+            if(tipo == 5){
+                saidas++;
+            }
+        }
+
+        if(getline(linhaCSV, valor, ',')){
+            erro = "Linha " + to_string(numeroLinha) + ": quantidade de colunas excedida.";
+            arquivo.close();
+            return false;
+        }
+    }
+
+    if(getline(arquivo, linha)){
+        erro = "Linha " + to_string(numeroLinha + 1) + ": existe uma linha extra apos o final da matriz.";
+        arquivo.close();
+        return false;
+    }
+
+    arquivo.close();
+
+    if(jogo.jogador.linha == -1){
+        erro = "Jogador ausente. O mapa deve ter exatamente um jogador (2).";
+        return false;
+    }
+
+    if(jogo.bloco.linha == -1){
+        erro = "Bloco ausente. O mapa deve ter exatamente um bloco (3).";
+        return false;
+    }
+
+    if(saidas == 0){
+        erro = "Saida ausente. O mapa deve ter pelo menos uma saida (5).";
+        return false;
+    }
+
+    // verifica se o bloco comeca sem flutuar
+    Jogo copia = jogo;
+    gravidade(copia);
+
+    if(copia.bloco.linha != jogo.bloco.linha){
+        erro = "Mapa instavel: o bloco comeca no ar e cairia pela gravidade.";
+        return false;
+    }
+
+    return true;
+}
+
+Função Jogo
+
+M1 - bool jogo(int m[11][11], int &px, int &py, int &bx, int &by, int &orientacao, int &movimentos, int &rotacoes, int numeroMapa){
+    char x;
+    system("cls");
+
+    while (true) {
+
+        cout<<"Mapa: "<<numeroMapa<<"      "<<endl;
+        cout<<"Movimentos: "<<movimentos<<"     "<<endl;
+        cout<<"Rotacoes: "<<rotacoes<<"     "<<endl;
+        cout<<"Orientacao: "<<orientacao<<" graus   "<<endl;
+
+        mapalabirinto(m, px, py, bx, by, orientacao);
+
+        // atualiza jogador
+        x = getch(); // pega a tecla
+
+        bool girou = false;
+
+        if(x == 27){
+            return false;
+        }
+
+        if(x == 'r'){
+            carregarMapa(numeroMapa, m, px, py, bx, by, orientacao, movimentos, rotacoes);
+        }
+
+        if(x == 'e' && alavancaPlayerEmcima(px, py, m)){
+            rotacionar(x, orientacao, rotacoes);
+            girarDireita(m);
+            girarPlayerDireita(px, py);
+            girarBlocoDireita(bx, by);
+
+            girou = true;
+        }
+        if(x == 'q' && alavancaPlayerEmcima(px, py, m)){
+            rotacionar(x, orientacao, rotacoes);
+            girarEsquerda(m);
+            girarPlayerEsquerda(px, py);
+            girarBlocoEsquerda(bx, by);
+
+            girou = true;
+        }
+
+        if(moveplayer(x, px, py, m, bx, by, orientacao)){
+            movimentos++;
+        }
+
+        if(girou){
+            esmagarBloco(m, bx, by, orientacao);
+
+            if(esmagarPlayer(px, py, m, orientacao)){
+                carregarMapa(numeroMapa, m, px, py, bx, by, orientacao, movimentos, rotacoes);
+            }
+
+        gravidade(m, bx, by, px ,py, orientacao);
+        }
+
+        if(vitoria(px, py, m)){
+            cout<<"Voce venceu!";
+            getch();
+            return true;
+        }
+        // coloca o cursor na posição inicial
+        PosicionaCursor(0, 0);
+        //(void)system("cls");
+    }
+    return false;
+}
+
+M2 - bool jogo(Jogo &jogo){
+    char x;
+    string erro;
+    system("cls");
+
+    while (true) {
+        // coloca o cursor na posi��o inicial
+        PosicionaCursor(0, 0);
+        //(void)system("cls");
+
+        cout<<"Mapa: "<<jogo.numeroMapa<<"      "<<endl;
+        cout<<"Movimentos: "<<jogo.movimentos<<"      "<<endl;
+        cout<<"Rotacoes: "<<jogo.rotacoes<<"      "<<endl;
+        cout<<"Orientacao: "<<jogo.orientacao * 90<<" graus      "<<endl;
+
+        mapalabirinto(jogo);
+
+        // atualiza jogador
+        x = getch(); // pega a tecla
+
+        if(x == 27){
+            if(salvarJogo(jogo)){
+                cout<<"\nPartida salva com sucesso!"<<endl;
+            }else{
+                cout<<"\nErro ao salvar a partida!"<<endl;
+            }
+
+            getch();
+            return false;
+        }
+
+        if(x == 'r'){
+            if(!carregarMapa(jogo, jogo.numeroMapa, erro)){
+                cout<<"Erro ao carregar o mapa: "<<erro<<endl;
+                getch();
+                return false;
+            }
+
+            continue;
+        }
+
+        bool continuar = processarTecla(x, jogo);
+
+        if(!continuar){
+            if(!carregarMapa(jogo, jogo.numeroMapa, erro)){
+                cout<<"Erro ao carregar o mapa: "<<erro<<endl;
+                getch();
+                return false;
+            }
+
+            continue;
+        }
+
+        if(vitoria(jogo)){
+            system("cls");
+
+            cout<<"Mapa: "<<jogo.numeroMapa<<endl;
+            cout<<"Movimentos: "<<jogo.movimentos<<endl;
+            cout<<"Rotacoes: "<<jogo.rotacoes<<endl;
+            cout<<"Orientacao: "<<jogo.orientacao * 90<<" graus"<<endl;
+
+            mapalabirinto(jogo);
+
+            cout<<endl<<endl;
+            cout<<"Voce venceu!"<<endl;
+
+            string nome;
+            bool nomeInvalido;
+            do{
+                nomeInvalido = false;
+
+                cout<<"Digite seu nome para o ranking (maximo 15 caracteres, sem virgulas): ";
+                cin>>nome;
+
+                if(nome.length() > 15){
+                    nomeInvalido = true;
+                }
+
+                for(int i = 0;i < nome.length();i++){
+                    if(nome[i] == ','){
+                        nomeInvalido = true;
+                    }
+                }
+
+                if(nomeInvalido){
+                    cout<<"Nome invalido! Tente novamente."<<endl;
+                }
+            }while(nomeInvalido);
+
+            registrarRecorde(nome, jogo.numeroMapa, jogo.movimentos, jogo.rotacoes);
+
+            cout<<endl;
+            cout<<"Recorde registrado!"<<endl;
+            cout<<"Pressione uma tecla para continuar...";
+            getch();
+
+            apagarJogoSalvo();
+            system("cls");
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
+| Defeitos corrigidos e decisões de implementação |
 
 Durante o desenvolvimento da M2, o código foi adaptado para utilizar a estrutura Jogo, carregar mapas externos e persistir o progresso em arquivos. Também foram tratados problemas relacionados à leitura dos mapas, ao carregamento do estado salvo e à atualização da tela durante a partida.
 
